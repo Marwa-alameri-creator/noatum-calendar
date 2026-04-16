@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Posts Calendar 2026 — Noatum Maritime</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#2E3955;--teal:#13C5BD;--light:#CFD0CC;--white:#FFFFFF;
+  --navy2:#1A2235;--navy3:#3D4F6E;--teal2:#0fa89f;--teal-light:#e6fafa;
+  --bg:#f0f2f5;--muted:#6b7a99;
+}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--navy);font-size:13px;min-height:100vh}
+
+/* ── TOP HEADER ── */
+.topbar{background:var(--navy);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-logo{width:36px;height:36px;object-fit:contain;border-radius:4px;background:#fff;padding:2px}
+.topbar-title{color:#fff;font-size:16px;font-weight:700;letter-spacing:.2px}
+.topbar-sub{color:var(--teal);font-size:11px;margin-top:1px}
+.topbar-badge{background:rgba(19,197,189,.15);color:var(--teal);font-size:11px;padding:5px 14px;border-radius:20px;font-weight:600;border:1px solid rgba(19,197,189,.3)}
+
+/* ── MAIN WRAP ── */
+.main{max-width:1200px;margin:0 auto;padding:24px 24px 40px}
+
+/* ── SUMMARY CARDS ── */
+.cal-summary{display:grid;grid-template-columns:1.2fr 20px repeat(7,1fr);gap:10px;margin-bottom:20px}
+.cs-card{background:#fff;border-radius:10px;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,.07);border-top:3px solid;cursor:pointer;transition:all .18s;user-select:none}
+.cs-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.cs-card.dimmed{opacity:.35}
+.cs-count{font-size:20px;font-weight:700}
+.cs-label{font-size:10px;color:var(--muted);margin-top:2px;font-weight:500}
+.cs-total{background:var(--navy) !important;border-top-color:var(--teal) !important}
+.cs-total .cs-count{color:#fff !important;font-size:26px}
+.cs-total .cs-label{color:rgba(255,255,255,.7) !important}
+
+/* ── FILTER BAR ── */
+.filter-bar{background:#fff;border-radius:12px;padding:14px 18px;margin-bottom:18px;box-shadow:0 1px 4px rgba(0,0,0,.07);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.filter-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-right:2px}
+.cf-btn{padding:6px 16px;border-radius:20px;border:1.5px solid #d4d8e2;background:#fff;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;transition:all .18s;white-space:nowrap}
+.cf-btn:hover{border-color:var(--teal);color:var(--teal)}
+.cf-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.cf-btn.cf-all.active{background:var(--teal);border-color:var(--teal);color:#fff}
+.filter-reset{margin-left:auto;padding:6px 16px;border-radius:8px;border:1px solid var(--teal);background:transparent;color:var(--teal);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}
+.filter-reset:hover{background:var(--teal);color:#fff}
+
+/* ── CALENDAR WRAPPER ── */
+.cal-wrap{background:#fff;border-radius:14px;box-shadow:0 1px 6px rgba(0,0,0,.08);overflow:hidden;margin-bottom:18px}
+.cal-nav-row{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f2f5}
+.cal-nav{display:flex;align-items:center;gap:12px}
+.cal-nav-btn{width:34px;height:34px;border-radius:8px;border:1px solid #d4d8e2;background:#fff;cursor:pointer;font-size:18px;color:var(--navy);display:flex;align-items:center;justify-content:center;transition:all .15s;line-height:1}
+.cal-nav-btn:hover{background:var(--teal);color:#fff;border-color:var(--teal)}
+.cal-month-label{font-size:17px;font-weight:700;color:var(--navy);min-width:180px;text-align:center}
+.cal-jump-btn{padding:6px 16px;border-radius:8px;border:1px solid #d4d8e2;background:#fff;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}
+.cal-jump-btn:hover{border-color:var(--teal);color:var(--teal)}
+.cal-post-count{font-size:11px;color:var(--muted)}
+
+/* ── DOW ROW ── */
+.cal-dow-row{display:grid;grid-template-columns:1.2fr 20px repeat(7,1fr);background:var(--navy)}
+.cal-dow{padding:11px 0;text-align:center;color:rgba(255,255,255,.6);font-size:11px;font-weight:600;letter-spacing:.5px}
+.cal-dow:first-child,.cal-dow:last-child{color:var(--teal)}
+
+/* ── DAY CELLS ── */
+.cal-days{display:grid;grid-template-columns:1.2fr 20px repeat(7,1fr)}
+.cal-day{min-height:100px;border-right:1px solid #f0f2f5;border-bottom:1px solid #f0f2f5;padding:7px 8px;background:#fff;transition:background .1s;vertical-align:top}
+.cal-day:nth-child(7n){border-right:none}
+.cal-day:hover{background:#f8fdfd}
+.cal-day.other-month{background:#f8f9fb}
+.cal-day.other-month .cal-day-num{color:#ccc}
+.cal-day.has-posts{background:#f5fbfb}
+.cal-day-num{font-size:12px;font-weight:600;color:var(--navy);margin-bottom:5px;line-height:1;display:flex;align-items:center}
+.cal-day-num.is-today{width:22px;height:22px;background:var(--teal);color:#fff;border-radius:50%;justify-content:center;font-size:11px}
+.cal-day.other-month .cal-day-num{font-weight:400}
+
+/* ── POST CHIPS ── */
+.post-chip{border-radius:5px;padding:3px 7px;margin-bottom:3px;font-size:9.5px;font-weight:600;line-height:1.35;cursor:default;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative}
+.post-chip:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 4px);left:0;background:var(--navy);color:#fff;font-size:10px;padding:4px 8px;border-radius:6px;white-space:nowrap;z-index:999;font-weight:400;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+
+.c-UAE{background:#fff0e0;color:#a04800}
+.c-China{background:#fdeaea;color:#9a0000}
+.c-Spain{background:#fff8e0;color:#8a5a00}
+.c-Turkey{background:#f2e8ff;color:#5500aa}
+.c-India{background:#fff3e0;color:#b84800}
+.c-Pakistan{background:#e8faf0;color:#0d6e35}
+.c-All{background:#e4fafa;color:#087a76}
+
+/* ── LEGEND ── */
+.legend{background:#fff;border-radius:12px;padding:14px 18px;box-shadow:0 1px 4px rgba(0,0,0,.07);display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.leg-title{font-size:11px;font-weight:700;color:var(--navy);margin-right:4px}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);font-weight:500}
+.leg-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+
+/* ── NO POSTS MSG ── */
+.no-posts{text-align:center;padding:40px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+
+<!-- TOP HEADER -->
+<div class="topbar">
+  <div class="topbar-left">
+    <img src="data:image/jpeg;base64,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" class="topbar-logo" alt="Noatum Maritime"/>
+    <div>
+      <div class="topbar-title">Noatum Maritime</div>
+      <div class="topbar-sub">LinkedIn Posts Calendar</div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
+    <div style="color:rgba(255,255,255,.4);font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase">CEO's Office</div>
+    <div class="topbar-badge">FY 2026</div>
+  </div>
+</div>
+
+<div style="background:var(--navy);border-top:1px solid rgba(255,255,255,.08);padding:10px 28px 14px">
+  <div style="max-width:1200px;margin:0 auto;display:flex;align-items:baseline;gap:14px">
+    <span style="color:var(--teal);font-size:22px;font-weight:700;letter-spacing:.3px">CEO's Office</span>
+    <span style="color:rgba(255,255,255,.3);font-size:13px">LinkedIn Posts Calendar · 2026</span>
+  </div>
+</div>
+<div class="main">
+
+  <!-- SUMMARY CARDS -->
+  <div class="cal-summary" id="cal-summary"></div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <span class="filter-label">Filter by Country</span>
+    <div id="country-filters" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+    <button class="filter-reset" onclick="resetFilters()">Show All</button>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="cal-wrap">
+    <div class="cal-nav-row">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="calPrev()">&#8249;</button>
+        <div class="cal-month-label" id="cal-month-label"></div>
+        <button class="cal-nav-btn" onclick="calNext()">&#8250;</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="cal-post-count" id="cal-post-count"></span>
+        <button class="cal-jump-btn" onclick="calGoStart()">&#8617; Jan 2026</button>
+      </div>
+    </div>
+    <div class="cal-dow-row">
+      <div class="cal-dow">SUN</div><div class="cal-dow">MON</div><div class="cal-dow">TUE</div>
+      <div class="cal-dow">WED</div><div class="cal-dow">THU</div><div class="cal-dow">FRI</div>
+      <div class="cal-dow">SAT</div>
+    </div>
+    <div class="cal-days" id="cal-days"></div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <span class="leg-title">Countries:</span>
+    <div class="leg-item"><div class="leg-dot" style="background:#ffc88a"></div>UAE</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#f7a8a8"></div>China</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#ffe08a"></div>Spain</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#d4a8ff"></div>Turkey</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#ffc08a"></div>India</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#8fe8b4"></div>Pakistan</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#88dedd"></div>All Regions</div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+const POSTS = [
+  {name:"Chinese New Year",          date:"2026-02-17",country:"China"},
+  {name:"Mid-Autumn Festival",       date:"2026-09-25",country:"China"},
+  {name:"Lantern Festival",          date:"2026-03-03",country:"China"},
+  {name:"Dragon Boat Festival",      date:"2026-06-19",country:"China"},
+  {name:"Eid Al Fitr",               date:"2026-03-19",country:"All"},
+  {name:"Eid Al Adha",               date:"2026-05-27",country:"All"},
+  {name:"Christmas",                 date:"2026-12-25",country:"All"},
+  {name:"Republic Day",              date:"2026-10-29",country:"Turkey"},
+  {name:"Victory Day",               date:"2026-08-30",country:"Turkey"},
+  {name:"National Sovereignty Day",  date:"2026-07-15",country:"Turkey"},
+  {name:"Three Kings' Day",          date:"2026-01-06",country:"Spain"},
+  {name:"Labour Day",                date:"2026-05-01",country:"Spain"},
+  {name:"National Day",              date:"2026-10-12",country:"Spain"},
+  {name:"UAE National Day",          date:"2026-12-02",country:"UAE"},
+  {name:"Commemoration Day",         date:"2026-12-01",country:"UAE"},
+  {name:"UAE Flag Day",              date:"2026-11-03",country:"UAE"},
+  {name:"Zayed Humanitarian Day",    date:"2026-03-19",country:"UAE"},
+  {name:"Islamic New Year",          date:"2026-06-17",country:"UAE"},
+  {name:"Prophet Muhammad's B-Day",  date:"2026-08-26",country:"UAE"},
+  {name:"Independence Day",          date:"2026-08-15",country:"India"},
+  {name:"Diwali",                    date:"2026-11-08",country:"India"},
+  {name:"Republic Day",              date:"2026-01-26",country:"India"},
+  {name:"Independence Day",          date:"2026-08-14",country:"Pakistan"},
+  {name:"Pakistan Day",              date:"2026-03-23",country:"Pakistan"},
+  {name:"Labour Day",                date:"2026-05-01",country:"Pakistan"},
+];
+
+const COUNTRIES = ['UAE','China','Spain','Turkey','India','Pakistan','All'];
+const BORDER_COLORS = {UAE:'#ff9a3c',China:'#e04444',Spain:'#f0a500',Turkey:'#9b30ff',India:'#e07800',Pakistan:'#1aaa55',All:'#13C5BD'};
+const CHIP_CLASS = {UAE:'c-UAE',China:'c-China',Spain:'c-Spain',Turkey:'c-Turkey',India:'c-India',Pakistan:'c-Pakistan',All:'c-All'};
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+let calYear = 2026, calMonth = 0;
+let activeCountries = new Set(COUNTRIES);
+
+function filteredPosts(){
+  return POSTS.filter(p => activeCountries.has(p.country));
+}
+
+// ── SUMMARY CARDS ────────────────────────────────────────────────
+function renderSummary(){
+  const countryCards = COUNTRIES.map(c => {
+    const total = POSTS.filter(p => p.country === c).length;
+    const active = activeCountries.has(c);
+    return `<div class="cs-card ${active?'':'dimmed'}" style="border-top-color:${BORDER_COLORS[c]}" onclick="toggleCountry('${c}')">
+      <div class="cs-count" style="color:${BORDER_COLORS[c]}">${total}</div>
+      <div class="cs-label">${c === 'All' ? 'All Regions' : c}</div>
+    </div>`;
+  }).join('');
+  const filteredTotal = filteredPosts().length;
+  const spacer = `<div></div>`;
+  const totalCard = `<div class="cs-card cs-total" style="border-top-color:#2E3955">
+    <div class="cs-count" style="color:#2E3955">${filteredTotal}</div>
+    <div class="cs-label" style="font-weight:700">Total Posts</div>
+    <div style="font-size:9px;color:#13C5BD;margin-top:3px;font-weight:600">${activeCountries.size === COUNTRIES.length ? 'All countries' : activeCountries.size + ' countr' + (activeCountries.size===1?'y':'ies') + ' selected'}</div>
+  </div>`;
+  document.getElementById('cal-summary').innerHTML = totalCard + spacer + countryCards;
+}
+
+// ── FILTER PILLS ─────────────────────────────────────────────────
+function renderFilters(){
+  const allActive = activeCountries.size === COUNTRIES.length;
+  let html = `<button class="cf-btn cf-all ${allActive?'active':''}" onclick="toggleAll()">All Countries</button>`;
+  html += COUNTRIES.map(c => {
+    const label = c === 'All' ? 'All Regions' : c;
+    const active = activeCountries.has(c);
+    return `<button class="cf-btn ${active?'active':''}" onclick="toggleCountry('${c}')" style="${active?'background:'+BORDER_COLORS[c]+';border-color:'+BORDER_COLORS[c]:''}">
+      ${label}
+    </button>`;
+  }).join('');
+  document.getElementById('country-filters').innerHTML = html;
+}
+
+// ── TOGGLE ───────────────────────────────────────────────────────
+function toggleAll(){
+  if(activeCountries.size === COUNTRIES.length) activeCountries.clear();
+  else activeCountries = new Set(COUNTRIES);
+  renderSummary(); renderFilters(); renderCalendar();
+}
+function toggleCountry(c){
+  if(activeCountries.has(c)) activeCountries.delete(c);
+  else activeCountries.add(c);
+  renderSummary(); renderFilters(); renderCalendar();
+}
+function resetFilters(){
+  activeCountries = new Set(COUNTRIES);
+  renderSummary(); renderFilters(); renderCalendar();
+}
+
+// ── CALENDAR ─────────────────────────────────────────────────────
+function renderCalendar(){
+  const fp = filteredPosts();
+
+  // Build date → posts map
+  const postMap = {};
+  fp.forEach(p => {
+    if(!postMap[p.date]) postMap[p.date] = [];
+    postMap[p.date].push(p);
+  });
+
+  document.getElementById('cal-month-label').textContent = MONTHS[calMonth] + ' ' + calYear;
+
+  // Count posts this month
+  const mm = String(calMonth+1).padStart(2,'0');
+  const thisMonthPosts = fp.filter(p => p.date.startsWith(calYear+'-'+mm));
+  document.getElementById('cal-post-count').textContent =
+    thisMonthPosts.length > 0 ? thisMonthPosts.length + ' post' + (thisMonthPosts.length>1?'s':'') + ' this month' : 'No posts this month';
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const daysInPrev = new Date(calYear, calMonth, 0).getDate();
+
+  let cells = [];
+  for(let i = firstDay-1; i >= 0; i--) cells.push({day:daysInPrev-i, cur:false});
+  for(let d = 1; d <= daysInMonth; d++) cells.push({day:d, cur:true});
+  const remaining = (Math.ceil(cells.length/7)*7) - cells.length;
+  for(let d = 1; d <= remaining; d++) cells.push({day:d, cur:false});
+
+  document.getElementById('cal-days').innerHTML = cells.map(cell => {
+    let dateStr = '', posts = [];
+    if(cell.cur){
+      const dd = String(cell.day).padStart(2,'0');
+      dateStr = `${calYear}-${mm}-${dd}`;
+      posts = postMap[dateStr] || [];
+    }
+    const hasPosts = posts.length > 0;
+    const cls = ['cal-day', !cell.cur?'other-month':'', hasPosts?'has-posts':''].filter(Boolean).join(' ');
+    const numCls = 'cal-day-num';
+    const chips = posts.map(p =>
+      `<div class="post-chip ${CHIP_CLASS[p.country]||'c-All'}" data-tip="${p.name} · ${p.country}">${p.name}</div>`
+    ).join('');
+    return `<div class="${cls}"><div class="${numCls}">${cell.day}</div>${chips}</div>`;
+  }).join('');
+}
+
+function calPrev(){ calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
+function calNext(){ calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCalendar(); }
+function calGoStart(){ calYear=2026; calMonth=0; renderCalendar(); }
+
+// ── INIT ─────────────────────────────────────────────────────────
+renderSummary();
+renderFilters();
+renderCalendar();
+</script>
+</body>
+</html>
